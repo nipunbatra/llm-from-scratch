@@ -48,6 +48,8 @@ format:
     code-overflow: wrap
     highlight-style: github
 
+notebook-view: true
+
 execute:
   enabled: false
   freeze: auto
