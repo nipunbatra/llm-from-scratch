@@ -3,13 +3,18 @@ LLM From Scratch - Interactive Demo
 A Gradio app showcasing models trained in the educational series.
 """
 
+import os
+import tempfile
+
+# Set Gradio temp directory before importing gradio
+os.environ["GRADIO_TEMP_DIR"] = tempfile.mkdtemp(prefix="gradio_")
+
 import torch
 import torch.nn.functional as F
 from torch import nn
 import math
 import gradio as gr
 from huggingface_hub import hf_hub_download
-import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -167,6 +172,7 @@ def load_models():
         "names": "char_lm_names.pt",
         "shakespeare": "transformer_shakespeare.pt",
         "instruction": "instruction_tuned.pt",
+        "code": "python_code_lm.pt",
     }
 
     for name, filename in model_files.items():
@@ -284,8 +290,12 @@ def answer_question(question, max_length=150, temperature=0.7):
     itos = checkpoint['itos']
     block_size = checkpoint['model_config']['block_size']
 
-    # Format as instruction
-    prompt = f"Q: {question}\nA:"
+    # Format matching training data exactly
+    prompt = f"""### Instruction:
+{question}
+
+### Response:
+"""
     tokens = [stoi.get(ch, 0) for ch in prompt]
     generated = list(prompt)
 
@@ -302,8 +312,48 @@ def answer_question(question, max_length=150, temperature=0.7):
         char = itos[next_idx]
         generated.append(char)
 
-        # Stop at newline (end of answer)
-        if char == '\n' and len(generated) > len(prompt) + 10:
+        # Stop at end-of-text token
+        if '<|endoftext|>' in ''.join(generated[-15:]):
+            break
+
+    # Extract just the response
+    response = ''.join(generated)
+    if "### Response:" in response:
+        response = response.split("### Response:")[-1].strip()
+        response = response.replace("<|endoftext|>", "").strip()
+
+    return response
+
+
+@torch.no_grad()
+def generate_code(prompt, max_length=200, temperature=0.7):
+    """Generate Python code completion."""
+    if "code" not in MODELS:
+        return "Code model not loaded."
+
+    checkpoint = MODELS["code"]
+    model = get_transformer_model(checkpoint)
+    stoi = checkpoint['stoi']
+    itos = checkpoint['itos']
+    block_size = checkpoint['model_config']['block_size']
+
+    tokens = [stoi.get(ch, 0) for ch in prompt]
+    generated = list(prompt)
+
+    for _ in range(max_length):
+        context = tokens[-block_size:] if len(tokens) >= block_size else tokens
+        x = torch.tensor([context]).to(device)
+
+        logits = model(x)
+        logits = logits[0, -1, :] / temperature
+        probs = F.softmax(logits, dim=-1)
+        next_idx = torch.multinomial(probs, 1).item()
+
+        tokens.append(next_idx)
+        generated.append(itos[next_idx])
+
+        # Stop at triple newline (end of function)
+        if ''.join(generated[-3:]) == '\n\n\n':
             break
 
     return ''.join(generated)
@@ -316,18 +366,7 @@ def answer_question(question, max_length=150, temperature=0.7):
 def create_demo():
     """Create the Gradio demo interface."""
 
-    with gr.Blocks(
-        title="LLM From Scratch",
-        theme=gr.themes.Base(
-            primary_hue="neutral",
-            font=gr.themes.GoogleFont("Inter"),
-        ),
-        css="""
-        .container { max-width: 800px; margin: auto; }
-        .title { text-align: center; margin-bottom: 0; }
-        .subtitle { text-align: center; color: #666; margin-top: 0.5rem; }
-        """
-    ) as demo:
+    with gr.Blocks(title="LLM From Scratch") as demo:
 
         gr.Markdown(
             """
@@ -335,8 +374,7 @@ def create_demo():
 
             Interactive demos of models trained in the [educational series](https://nipunbatra.github.io/llm-from-scratch/).
             These are tiny models (~600K parameters) trained for learning purposes.
-            """,
-            elem_classes=["title"]
+            """
         )
 
         with gr.Tabs():
@@ -366,8 +404,7 @@ def create_demo():
                     with gr.Column():
                         name_output = gr.Textbox(
                             label="Generated Names",
-                            lines=10,
-                            show_copy_button=True
+                            lines=10
                         )
 
                 name_btn.click(
@@ -406,8 +443,7 @@ def create_demo():
                     with gr.Column():
                         shakespeare_output = gr.Textbox(
                             label="Generated Text",
-                            lines=15,
-                            show_copy_button=True
+                            lines=15
                         )
 
                 shakespeare_btn.click(
@@ -443,17 +479,19 @@ def create_demo():
                     with gr.Column():
                         qa_output = gr.Textbox(
                             label="Answer",
-                            lines=8,
-                            show_copy_button=True
+                            lines=8
                         )
 
                 gr.Examples(
                     examples=[
-                        ["What is a Python list?"],
-                        ["How do I reverse a string in Python?"],
-                        ["What is recursion?"],
+                        ["What is the capital of France?"],
+                        ["What is 2 + 2?"],
+                        ["What is Python?"],
+                        ["How do I print Hello World in Python?"],
                         ["What is a for loop?"],
-                        ["How do I read a file in Python?"],
+                        ["What is recursion?"],
+                        ["What is Big O notation?"],
+                        ["Say hello."],
                     ],
                     inputs=[qa_question],
                 )
@@ -464,7 +502,60 @@ def create_demo():
                     outputs=qa_output
                 )
 
-            # Tab 4: About
+            # Tab 4: Python Code Generation
+            with gr.TabItem("Code"):
+                gr.Markdown(
+                    """
+                    ### Part 7: Python Code Generation
+                    Complete Python functions using a model trained on code patterns.
+                    """
+                )
+
+                with gr.Row():
+                    with gr.Column():
+                        code_prompt = gr.Textbox(
+                            label="Function signature",
+                            value='def is_even(n):\n    """',
+                            lines=3,
+                            info="Start with a function definition"
+                        )
+                        code_length = gr.Slider(
+                            minimum=50, maximum=300, value=150, step=50,
+                            label="Max length"
+                        )
+                        code_temp = gr.Slider(
+                            minimum=0.3, maximum=1.2, value=0.7, step=0.1,
+                            label="Temperature"
+                        )
+                        code_btn = gr.Button("Generate Code", variant="primary")
+
+                    with gr.Column():
+                        code_output = gr.Code(
+                            label="Generated Code",
+                            language="python",
+                            lines=12
+                        )
+
+                gr.Examples(
+                    examples=[
+                        ['def is_even(n):\n    """'],
+                        ['def factorial(n):\n    """'],
+                        ['def reverse_string(s):\n    """'],
+                        ['def find_max(numbers):\n    """'],
+                        ['def is_prime(n):\n    """'],
+                        ['def sum_list(numbers):\n    """'],
+                        ['class Stack:\n    """'],
+                    ],
+                    inputs=[code_prompt],
+                )
+
+                code_btn.click(
+                    fn=generate_code,
+                    inputs=[code_prompt, code_length, code_temp],
+                    outputs=code_output
+                )
+
+            # Tab 5: About
             with gr.TabItem("About"):
                 gr.Markdown(
                     """
@@ -506,8 +597,7 @@ def create_demo():
             """
             ---
             Built with PyTorch and Gradio. Part of the [LLM From Scratch](https://github.com/nipunbatra/llm-from-scratch) series.
-            """,
-            elem_classes=["subtitle"]
+            """
         )
 
     return demo
