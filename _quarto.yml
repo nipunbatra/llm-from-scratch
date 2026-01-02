@@ -3,9 +3,14 @@ project:
   output-dir: _site
 
 website:
-  title: "LLM from Scratch"
-  description: "A 6-part educational series building language models from the ground up"
+  title: "LLM From Scratch"
+  description: "A 7-part educational series building language models from the ground up"
+  site-url: https://nipunbatra.github.io/llm-from-scratch/
+  repo-url: https://github.com/nipunbatra/llm-from-scratch
+  repo-actions: [issue]
+
   navbar:
+    background: primary
     left:
       - text: "Home"
         href: index.qmd
@@ -13,9 +18,9 @@ website:
         menu:
           - text: "Part 1: Character-Level LM"
             href: notebooks/part-1-char-lm.ipynb
-          - text: "Part 2: Shakespeare Pretraining"
+          - text: "Part 2: Shakespeare"
             href: notebooks/part-2-shakespeare.ipynb
-          - text: "Part 3: BPE Tokenizer"
+          - text: "Part 3: BPE Tokenization"
             href: notebooks/part-3-bpe.ipynb
           - text: "Part 4: Self-Attention"
             href: notebooks/part-4-attention.ipynb
@@ -23,18 +28,26 @@ website:
             href: notebooks/part-5-instruction.ipynb
           - text: "Part 6: DPO Alignment"
             href: notebooks/part-6-dpo.ipynb
+          - text: "Part 7: Python Code Gen"
+            href: notebooks/part-7-python-code.ipynb
     right:
       - icon: github
         href: https://github.com/nipunbatra/llm-from-scratch
 
+  page-footer:
+    center: "Built with PyTorch. Rendered with Quarto."
+
 format:
   html:
-    theme: cosmo
+    theme:
+      light: flatly
+      dark: darkly
     toc: true
     toc-depth: 3
     code-fold: false
-    code-tools: true
+    code-overflow: wrap
     highlight-style: github
 
 execute:
+  enabled: false
   freeze: auto
