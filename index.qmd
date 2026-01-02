@@ -1,399 +1,288 @@
 ---
-title: "LLM From Scratch"
-subtitle: "Build a Large Language Model from the Ground Up"
-author: "Nipun Batra"
+pagetitle: "LLM From Scratch"
 format:
   html:
-    theme:
-      light: flatly
-      dark: darkly
-    toc: true
-    toc-depth: 2
-    code-fold: false
-    highlight-style: github
+    toc: false
+    page-layout: full
+    title-block: none
 ---
 
 ```{=html}
 <style>
-.hero-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 3rem 2rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
+:root {
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --bg-primary: #fbfbfd;
+  --border-color: #d2d2d7;
+  --link-color: #0066cc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --bg-primary: #000;
+    --border-color: #424245;
+    --link-color: #2997ff;
+  }
+}
+
+.landing {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 22px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+}
+
+.hero {
   text-align: center;
+  padding: 80px 0 60px;
 }
-.hero-banner h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.07;
+  margin: 0 0 16px;
+  color: var(--text-primary);
 }
-.hero-banner p {
-  font-size: 1.2rem;
-  opacity: 0.9;
+
+.hero .subtitle {
+  font-size: 21px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.38;
 }
-.part-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.part-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-.part-number {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
+
+.metrics {
+  display: flex;
   justify-content: center;
-  font-weight: bold;
-  font-size: 1.3rem;
-  margin-right: 1rem;
+  gap: 64px;
+  padding: 48px 0;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 }
-.tech-badge {
-  display: inline-block;
-  background: #f0f0f0;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  margin: 0.25rem;
-}
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-  margin: 2rem 0;
-}
-.stat-box {
+
+.metric {
   text-align: center;
-  padding: 1.5rem;
-  background: #f8f9fa;
-  border-radius: 8px;
 }
-.stat-number {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #667eea;
+
+.metric-value {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
-.architecture-diagram {
-  background: #1a1a2e;
-  color: #eee;
-  padding: 1.5rem;
-  border-radius: 8px;
-  font-family: monospace;
-  overflow-x: auto;
-  margin: 1rem 0;
+
+.metric-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.parts {
+  padding: 64px 0;
+}
+
+.parts h2 {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+  margin: 0 0 48px;
+  color: var(--text-primary);
+}
+
+.part {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: baseline;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border-color);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.part:hover {
+  opacity: 0.7;
+}
+
+.part:first-of-type {
+  border-top: 1px solid var(--border-color);
+}
+
+.part-num {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.part-content h3 {
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+}
+
+.part-content p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.47;
+}
+
+.part-arrow {
+  font-size: 21px;
+  color: var(--text-secondary);
+}
+
+.setup {
+  padding: 64px 0;
+  text-align: center;
+}
+
+.setup h2 {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 32px;
+  color: var(--text-primary);
+}
+
+.setup pre {
+  display: inline-block;
+  text-align: left;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  padding: 20px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  line-height: 1.6;
+}
+
+.footer {
+  text-align: center;
+  padding: 48px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.footer a {
+  color: var(--link-color);
+  text-decoration: none;
 }
 </style>
-```
 
-::: {.hero-banner}
-# Build an LLM From Scratch
-
-**A 7-part educational series on building Large Language Models**
-
-From character-level models to instruction-tuned transformers with DPO alignment
-:::
-
-## What You'll Build
-
-This hands-on series takes you from basic language modeling to a complete, aligned LLM. By the end, you'll understand exactly how models like GPT and Claude work under the hood.
-
-::: {.stats-grid}
-::: {.stat-box}
-::: {.stat-number}
-7
-:::
-Interactive Parts
-:::
-
-::: {.stat-box}
-::: {.stat-number}
-~600K
-:::
-Parameters
-:::
-
-::: {.stat-box}
-::: {.stat-number}
-100%
-:::
-From Scratch
-:::
-
-::: {.stat-box}
-::: {.stat-number}
-PyTorch
-:::
-Framework
-:::
-:::
-
-## The Complete Pipeline
-
-::: {.architecture-diagram}
-```
-                    THE LLM PIPELINE
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-    Part 1-2: PRETRAINING          Part 3: TOKENIZATION
-    ┌─────────────────┐            ┌─────────────────┐
-    │  Raw Text       │            │  BPE Tokenizer  │
-    │  → Patterns     │     →      │  → Subwords     │
-    │  → Predictions  │            │  → Efficiency   │
-    └─────────────────┘            └─────────────────┘
-            │                              │
-            ▼                              ▼
-    Part 4: ARCHITECTURE           Part 5: INSTRUCTION TUNING
-    ┌─────────────────┐            ┌─────────────────┐
-    │  Self-Attention │            │  Q&A Format     │
-    │  → Transformers │     →      │  → Following    │
-    │  → Context      │            │  → Instructions │
-    └─────────────────┘            └─────────────────┘
-            │                              │
-            ▼                              ▼
-    Part 6: ALIGNMENT              Part 7: CODE GENERATION
-    ┌─────────────────┐            ┌─────────────────┐
-    │  DPO Training   │            │  Python Code    │
-    │  → Preferences  │     →      │  → Generation   │
-    │  → Safety       │            │  → Testing      │
-    └─────────────────┘            └─────────────────┘
-```
-:::
-
-## The Series
-
-### Part 1: Character-Level Language Model {.part-card}
-
-::: {.part-number}
-1
-:::
-
-**Your first language model** — Learn the fundamentals of next-token prediction by building a character-level model that generates names.
-
-::: {.tech-badge}
-Neural Networks
-:::
-::: {.tech-badge}
-Embeddings
-:::
-::: {.tech-badge}
-Cross-Entropy Loss
-:::
-
-[Start Part 1 →](notebooks/part-1-char-lm.html)
-
----
-
-### Part 2: Shakespeare Text Generation {.part-card}
-
-::: {.part-number}
-2
-:::
-
-**Scale up to literature** — Apply the same architecture to Shakespeare's works and generate creative text that mimics the Bard's style.
-
-::: {.tech-badge}
-Text Generation
-:::
-::: {.tech-badge}
-Temperature Sampling
-:::
-::: {.tech-badge}
-1.1M Characters
-:::
-
-[Start Part 2 →](notebooks/part-2-shakespeare.html)
-
----
-
-### Part 3: BPE Tokenization {.part-card}
-
-::: {.part-number}
-3
-:::
-
-**Beyond characters** — Implement Byte-Pair Encoding (BPE) from scratch to understand how modern LLMs efficiently represent text.
-
-::: {.tech-badge}
-Tokenization
-:::
-::: {.tech-badge}
-Subword Units
-:::
-::: {.tech-badge}
-Vocabulary Building
-:::
-
-[Start Part 3 →](notebooks/part-3-bpe.html)
-
----
-
-### Part 4: Self-Attention & Transformers {.part-card}
-
-::: {.part-number}
-4
-:::
-
-**The heart of modern AI** — Build the transformer architecture from scratch: self-attention, multi-head attention, and positional encoding.
-
-::: {.tech-badge}
-Self-Attention
-:::
-::: {.tech-badge}
-Multi-Head
-:::
-::: {.tech-badge}
-Positional Encoding
-:::
-::: {.tech-badge}
-Layer Norm
-:::
-
-[Start Part 4 →](notebooks/part-4-attention.html)
-
----
-
-### Part 5: Instruction Tuning {.part-card}
-
-::: {.part-number}
-5
-:::
-
-**From completion to conversation** — Transform your base model into an instruction-following assistant with supervised fine-tuning (SFT).
-
-::: {.tech-badge}
-SFT
-:::
-::: {.tech-badge}
-Q&A Format
-:::
-::: {.tech-badge}
-Python Knowledge
-:::
-::: {.tech-badge}
-77 Examples
-:::
-
-[Start Part 5 →](notebooks/part-5-instruction.html)
-
----
-
-### Part 6: DPO Alignment {.part-card}
-
-::: {.part-number}
-6
-:::
-
-**Teaching preferences** — Implement Direct Preference Optimization (DPO) to align your model with human preferences without reward models.
-
-::: {.tech-badge}
-DPO
-:::
-::: {.tech-badge}
-Alignment
-:::
-::: {.tech-badge}
-Preferences
-:::
-::: {.tech-badge}
-Safety
-:::
-
-[Start Part 6 →](notebooks/part-6-dpo.html)
-
----
-
-### Part 7: Python Code Generation {.part-card}
-
-::: {.part-number}
-7
-:::
-
-**Practical application** — Train a model to generate working Python code, complete with automated testing of generated functions.
-
-::: {.tech-badge}
-Code Generation
-:::
-::: {.tech-badge}
-Syntax Learning
-:::
-::: {.tech-badge}
-Automated Testing
-:::
-
-[Start Part 7 →](notebooks/part-7-python-code.html)
-
----
-
-## Key Concepts Covered
-
-| Topic | Parts | What You'll Learn |
-|-------|-------|-------------------|
-| **Language Modeling** | 1, 2 | Next-token prediction, loss functions, sampling strategies |
-| **Tokenization** | 3 | BPE algorithm, vocabulary building, compression |
-| **Attention** | 4 | Query-Key-Value, causal masking, multi-head attention |
-| **Transformers** | 4 | Residual connections, layer norm, feed-forward networks |
-| **Fine-tuning** | 5, 6 | Instruction format, SFT, preference learning |
-| **Alignment** | 6 | DPO loss, reference models, safety training |
-| **Code Models** | 7 | Syntax learning, code completion, validation |
-
-## Model Scale Context
-
-Our educational models are intentionally small for fast training:
-
-```
-Our Models:      ~600K parameters   (tiny!)
-GPT-2 Small:     124M parameters    (200x larger)
-GPT-3:           175B parameters    (290,000x larger)
-GPT-4/Claude:    ~1T+ parameters    (1,600,000x larger)
-```
-
-Despite being 1,000,000x smaller than production models, our models demonstrate all the key concepts!
-
-## Requirements
-
-- **Python 3.8+**
-- **PyTorch 2.0+**
-- **GPU recommended** (but CPU works for small models)
-
-```bash
-pip install torch matplotlib jupyter
-```
-
-## Features
-
-- **Resumable Training** — Interrupt anytime, checkpoint saves automatically
-- **Fast Educational Demos** — Optimized for quick iteration (2-5 min per notebook)
-- **GPU Memory Cleanup** — Proper cleanup between notebooks
-- **Model Export** — Save and load trained models
-
-## Get Started
-
-Clone the repository and start with Part 1:
-
-```bash
-git clone https://github.com/nipunbatra/llm-from-scratch.git
+<div class="landing">
+  <section class="hero">
+    <h1>LLM From Scratch</h1>
+    <p class="subtitle">Build a Large Language Model from the ground up.<br>Seven notebooks. Pure PyTorch. No magic.</p>
+  </section>
+
+  <section class="metrics">
+    <div class="metric">
+      <div class="metric-value">7</div>
+      <div class="metric-label">Parts</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">600K</div>
+      <div class="metric-label">Parameters</div>
+    </div>
+    <div class="metric">
+      <div class="metric-value">100%</div>
+      <div class="metric-label">From Scratch</div>
+    </div>
+  </section>
+
+  <section class="parts">
+    <h2>The Series</h2>
+
+    <a href="notebooks/part-1-char-lm.html" class="part">
+      <span class="part-num">01</span>
+      <div class="part-content">
+        <h3>Character-Level Language Model</h3>
+        <p>Learn next-token prediction by building a model that generates names</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-2-shakespeare.html" class="part">
+      <span class="part-num">02</span>
+      <div class="part-content">
+        <h3>Shakespeare Text Generation</h3>
+        <p>Scale up to literature with temperature sampling and creative text generation</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-3-bpe.html" class="part">
+      <span class="part-num">03</span>
+      <div class="part-content">
+        <h3>BPE Tokenization</h3>
+        <p>Implement Byte-Pair Encoding to understand subword tokenization</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-4-attention.html" class="part">
+      <span class="part-num">04</span>
+      <div class="part-content">
+        <h3>Self-Attention & Transformers</h3>
+        <p>Build the transformer architecture: attention, multi-head, positional encoding</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-5-instruction.html" class="part">
+      <span class="part-num">05</span>
+      <div class="part-content">
+        <h3>Instruction Tuning</h3>
+        <p>Transform your base model into an instruction-following assistant with SFT</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-6-dpo.html" class="part">
+      <span class="part-num">06</span>
+      <div class="part-content">
+        <h3>DPO Alignment</h3>
+        <p>Implement Direct Preference Optimization for human preference alignment</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+
+    <a href="notebooks/part-7-python-code.html" class="part">
+      <span class="part-num">07</span>
+      <div class="part-content">
+        <h3>Python Code Generation</h3>
+        <p>Train a model to generate working Python code with automated testing</p>
+      </div>
+      <span class="part-arrow">›</span>
+    </a>
+  </section>
+
+  <section class="setup">
+    <h2>Get Started</h2>
+    <pre>git clone https://github.com/nipunbatra/llm-from-scratch.git
 cd llm-from-scratch
-jupyter notebook notebooks/part-1-char-lm.ipynb
+pip install torch matplotlib jupyter</pre>
+  </section>
+
+  <section class="footer">
+    <p>Built by <a href="https://github.com/nipunbatra">Nipun Batra</a> · <a href="https://github.com/nipunbatra/llm-from-scratch">View on GitHub</a></p>
+  </section>
+</div>
 ```
-
-## License
-
-MIT License - Feel free to use for learning and teaching!
-
----
-
-::: {.callout-tip}
-## Pro Tip
-Run the notebooks in order! Each part builds on concepts from previous parts. The transformer in Part 4 is used in Parts 5-7.
-:::
-
----
-
-*Built with PyTorch. Rendered with Quarto.*
