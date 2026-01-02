@@ -7,3 +7,4 @@ __pycache__/
 *.txt
 !requirements.txt
 .DS_Store
+models/
