@@ -1,0 +1,9 @@
+_site/
+.quarto/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.csv
+*.txt
+!requirements.txt
+.DS_Store

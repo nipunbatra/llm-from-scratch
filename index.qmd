@@ -1,0 +1,37 @@
+---
+title: "LLM from Scratch"
+subtitle: "Building Language Models from the Ground Up"
+---
+
+A 6-part educational series that builds language models from scratch, progressively adding complexity while keeping everything understandable.
+
+## The Journey
+
+| Part | Topic | What You'll Learn |
+|------|-------|-------------------|
+| [**Part 1**](notebooks/part-1-char-lm.qmd) | Character-Level LM | Embeddings, MLPs, training loops, generating text |
+| [**Part 2**](notebooks/part-2-shakespeare.qmd) | Shakespeare Pretraining | Applying the same model to different data |
+| [**Part 3**](notebooks/part-3-bpe.qmd) | BPE Tokenizer | Byte-pair encoding from scratch, subword tokenization |
+| [**Part 4**](notebooks/part-4-attention.qmd) | Self-Attention | The transformer's core mechanism |
+| [**Part 5**](notebooks/part-5-instruction.qmd) | Instruction Tuning | Making the model follow instructions |
+| [**Part 6**](notebooks/part-6-dpo.qmd) | DPO Alignment | Aligning with human preferences |
+
+## Philosophy
+
+Every line of code is written from scratch and explained. No magic, no black boxes. By the end, you'll understand how modern LLMs work at a fundamental level.
+
+## Prerequisites
+
+- Python basics
+- PyTorch fundamentals (tensors, autograd)
+- Basic calculus and linear algebra
+
+## Getting Started
+
+```bash
+git clone https://github.com/nipunbatra/llm-from-scratch
+cd llm-from-scratch
+pip install -r requirements.txt
+```
+
+Then open the notebooks in order, starting with Part 1.

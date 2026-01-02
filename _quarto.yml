@@ -1,0 +1,40 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "LLM from Scratch"
+  description: "A 6-part educational series building language models from the ground up"
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Parts"
+        menu:
+          - text: "Part 1: Character-Level LM"
+            href: notebooks/part-1-char-lm.ipynb
+          - text: "Part 2: Shakespeare Pretraining"
+            href: notebooks/part-2-shakespeare.ipynb
+          - text: "Part 3: BPE Tokenizer"
+            href: notebooks/part-3-bpe.ipynb
+          - text: "Part 4: Self-Attention"
+            href: notebooks/part-4-attention.ipynb
+          - text: "Part 5: Instruction Tuning"
+            href: notebooks/part-5-instruction.ipynb
+          - text: "Part 6: DPO Alignment"
+            href: notebooks/part-6-dpo.ipynb
+    right:
+      - icon: github
+        href: https://github.com/nipunbatra/llm-from-scratch
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    code-fold: false
+    code-tools: true
+    highlight-style: github
+
+execute:
+  freeze: auto
